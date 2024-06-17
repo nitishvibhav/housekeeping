@@ -9,4 +9,11 @@ export const ImagePath = {
     cleaning : require ('../images/cleaning.png'),
     lostFocused : require ('../images/lost_fill.png'),
     lost : require ('../images/lost_stoke.png'),
+    loginPageImage: require('../images/login_app.png'),
+    nextIcon: require('../images/next_icon.png'),
+    menuPath: require('../images/menu.png'),
+    Checkbox : require('../images/unchecked.png'),
+    checked: require('../images/checked1.png'),
+    roomIcon:require('../images/roomIcon.png'),
+    cautionMark: require('../images/caution.png')
 }

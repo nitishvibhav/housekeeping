@@ -1,6 +1,6 @@
 import {LOGIN_USER} from './konstant';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {setUser} from '../../../utils';
+import { setUser } from '../../../utils';
 const initialState = {
   user: [],
   createState: 0,

@@ -21,6 +21,7 @@ const getUser = async () => {
   }
 };
 
+console.log(getUser, "userdetails")
 // Get access token from AsyncStorage
 const getAccessToken = async () => {
   try {

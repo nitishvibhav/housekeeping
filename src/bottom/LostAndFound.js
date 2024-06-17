@@ -1,8 +1,41 @@
-import {StyleSheet, Text, View, TextInput, Image, Button} from 'react-native';
-import React from 'react';
+import {StyleSheet, Text, View, TextInput, Image, Button,Alert} from 'react-native';
+import React, { useState } from 'react';
 import CustomButton from '../components/CustomButton';
+import {useDispatch} from 'react-redux';
+import {postLostAndFoundDetails} from '../redux/lostAndFound/action';
+import {get} from 'lodash';
 
 const LostAndFound = () => {
+  const dispatch = useDispatch();
+
+  const handlePost = async() => {
+    const req = {
+      hotelId:"hotelIdhere51",
+      roomId:"4545f4s54f5",
+      userId:"hkfhakhfkahk",
+      roomNumber:"106",
+      title:"Found laptop",
+      description:"Found the product",
+      status:"FOUND"
+    };
+
+    try {
+      const res = await dispatch(postLostAndFoundDetails(req));
+      const status = get(res, 'value.status', res.status); 
+      console.log('Response:', res);
+      if (status === 200) {
+        Alert.alert('Success', 'Data submitted successfully.');
+      } else {
+        console.error('Failed response data:', res);
+        Alert.alert('Error', 'Failed to submit data.');
+      }
+    } catch (error) {
+      console.error('Error response:', error.response);
+      console.error('Error message:', error.message);
+      Alert.alert('Error', 'An error occurred while submitting data.');
+    }
+  };
+ 
   return (
     <View>
       <View style={styles.container}>
@@ -39,7 +72,7 @@ const LostAndFound = () => {
           textAlignVertical="top"
         />
       </View>
-      <CustomButton title="Submit" width="95%" />
+      <CustomButton title="Submit" width="95%" onPress={handlePost} />
     </View>
   );
 };
