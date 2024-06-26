@@ -1,8 +1,7 @@
 const initialState = {
   postState: 0,
   getState:0,
-  lostandFoundData: {},
-  lostandFoundDatapost:{}
+  lostandFoundData: [],
 };
 
 const reducer = (state = initialState, action) => {
@@ -10,7 +9,7 @@ const reducer = (state = initialState, action) => {
     case 'POST_LOSTANDFOUND_PENDING':
       return {...state, postState: 1};
     case 'POST_LOSTANDFOUND_FULFILLED':
-      return {...state, postState: 2, lostandFoundDatapost: action.payload.data};
+      return {...state, postState: 2, lostandFoundData: action.payload.data};
     case 'POST_LOSTANDFOUND_REJECTED':
       return {...state, postState: 3};
 

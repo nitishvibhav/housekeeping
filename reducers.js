@@ -5,6 +5,7 @@ import refilListReducer from './src/redux/refilList/reducer'
 import toDoListReducer from './src/redux/todoList/reducer'
 import cleaningReducer from './src/redux/cleaning/reducer'
 import maintenanceReducer from './src/redux/maintenance/reducer'
+import departmentReducer from './src/redux/department/reducer'
 
 export default combineReducers({
     loginReducer,
@@ -13,4 +14,5 @@ export default combineReducers({
     toDoListReducer,
     cleaningReducer,
     maintenanceReducer,
+    departmentReducer,
 })

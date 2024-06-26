@@ -39,7 +39,7 @@ import { login } from '../redux/user/action';
       console.log('status', status);
       if (status === 200) {
         alert('Login Successfully');
-        navigation.navigate('BottomNavigator');
+        navigation.navigate('BottomTabs');
       } else {
         console.log('res', res);
         alert('Invalied username or password...');

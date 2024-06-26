@@ -1,57 +1,81 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Home from './src/screens/Home';
 import BottomNavigator from './src/bottom/BottomNavigator';
 import ToDoPage from './src/screens/ToDoPage';
 import Login from './src/screens/Login';
 import { getUser } from './utils';
+import { useDispatch, useSelector } from 'react-redux';
+import { setUser } from './src/redux/user/action';
+import { createStackNavigator } from '@react-navigation/stack';
 
-// Creating stack navigators for Auth and Main
-const AuthStack = createNativeStackNavigator();
-const MainStack = createNativeStackNavigator();
+const Stack = createStackNavigator();
 
 const AuthStackNavigator = () => {
   return (
-    <AuthStack.Navigator>
-      <AuthStack.Screen
+    <Stack.Navigator>
+      <Stack.Screen
         name="Login"
         component={Login}
         options={{ headerShown: false }}
       />
-    </AuthStack.Navigator>
+     
+    </Stack.Navigator>
   );
 };
 
 const MainStackNavigator = () => {
   return (
-    <MainStack.Navigator>
-     
-      <MainStack.Screen
-        name="BottomNavigator"
-        component={BottomNavigator}
-        options={{ headerShown: false }}
-      />
-      <MainStack.Screen
+    <Stack.Navigator>
+
+    <Stack.Screen
+      name="BottomTabs"
+      component={BottomNavigator}
+      options={{ headerShown: false }}
+    />
+      <Stack.Screen
       name="Home"
       component={Home}
       options={{ headerShown: false }}
     />
-      <MainStack.Screen
+      <Stack.Screen
         name="ToDoPage"
         component={ToDoPage}
         options={{ headerShown: true, title: 'Details' }}
       />
-    </MainStack.Navigator>
+      
+    </Stack.Navigator>
   );
 };
 
+
 const AppNavigator = () => {
-  const isLoggedIn = false; // Replace with your actual authentication logic
+
+  const user = useSelector(state => state.user);
+  const dispatch = useDispatch();
+
+  console.log(user, "line no. 56........")
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const userData = await getUser();
+        console.log('User data from AsyncStorage:', userData); // Check userData
+        if (userData) {
+          dispatch(setUser(userData)); // Dispatch action to set user data in Redux store
+        }
+      } catch (error) {
+        console.error('Error fetching user:', error);
+      }
+    };
+
+    fetchUser();
+  }, [dispatch]);
+
 
   return (
     <NavigationContainer>
-      {getUser ? <MainStackNavigator /> : <AuthStackNavigator />}
+    {getUser ? <MainStackNavigator /> : <AuthStackNavigator />}
     </NavigationContainer>
   );
 };

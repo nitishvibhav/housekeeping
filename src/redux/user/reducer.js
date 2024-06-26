@@ -19,7 +19,7 @@ const reducer = (state = initialState, action) => {
     case `${LOGIN_USER}_FULFILLED`:
       const user = action.payload.data;
       setUser(user);
-      AsyncStorage.setItem('result', JSON.stringify(user))
+      AsyncStorage.setItem('result', JSON.stringify(user));
       return {...state, loginState: 2, user};
     case `${LOGIN_USER}_REJECTED`:
       return {
