@@ -15,7 +15,6 @@ const Cleaning = () => {
   const [dropdownValues, setDropdownValues] = useState({});
   const {toDoList} = useSelector(state => state.toDoListReducer);
   const {refilList} = useSelector(state => state.refilListReducer);
-  const {cleaningData} = useSelector(state => state.cleaningReducer);
 
   const data = [
     {label: '1', value: '1'},
@@ -81,6 +80,7 @@ const Cleaning = () => {
         <Image source={ImagePath.roomIcon} style={styles.iconImage} />
         <Text>Room Number : 206</Text>
       </View>
+      
       <Text style={styles.headingText}>TO DO LIST</Text>
       <View style={styles.miniContainer}>
         {toDoList?.result?.map(item => (

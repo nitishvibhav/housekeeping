@@ -1,19 +1,73 @@
-import {StyleSheet, Text, View, Image, TextInput, Button} from 'react-native';
+import {StyleSheet, Text, View, Image, TextInput, Alert} from 'react-native';
 import React, {useState} from 'react';
 import {ImagePath} from '../assets/images/imagePath';
-import {Dropdown} from 'react-native-element-dropdown';
+import CustomDropdown from '../components/CustomDropdown';
 import CustomButton from '../components/CustomButton';
+import {postInspectionDetails} from '../redux/inspection/action';
+import {useSelector} from 'react-redux';
+import {get} from 'lodash';
+import {useDispatch} from 'react-redux';
+import {useNavigation} from '@react-navigation/native';
 
 const Inspection = () => {
-  const data = [
-    {label: 'Everything Fine', value: '1'},
-    {label: 'Issue', value: '2'},
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
+  const {user} = useSelector(state => state.loginReducer);
+  const [data, setData] = useState({
+    remark: '',
+    selectedStatus: '',
+    inspectionTime: '',
+  });
+
+  const handleChange = (name, value) => {
+    setData(prevState => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
+
+  const resetForm = () => {
+    setData({
+      remark: '',
+      selectedStatus: '',
+      inspectionTime: '',
+    });
+  };
+
+  const statusOptions = [
+    {label: 'Issue', value: 'ISSUE'},
+    {label: 'Fine', value: 'FINE'},
   ];
 
-  const [value, setValue] = useState(null);
+  const handleSubmit = async () => {
+    const req = {
+      hotelId: 'hotelIdhere5111',
+      roomId: '4545f4s54f5s',
+      userId: user.result._id,
+      roomNumber: '105',
+      remark: data.remark,
+      inspectionTime: data.inspectionTime,
+      resolveStatus: data.selectedStatus,
+    };
+
+    try {
+      const res = await dispatch(postInspectionDetails(req));
+      const status = get(res, 'value.status', res.status);
+      if (status === 200) {
+        Alert.alert('Success', 'Data submitted successfully.');
+        resetForm();
+        navigation.navigate('Home');
+      } else {
+        console.error('Failed response data:', res);
+      }
+    } catch (error) {
+      console.error('Error response:', error.response);
+    }
+  };
+
   return (
     <View>
-      <View style={{backgroundColor: 'white', marginTop: 10}}>
+      <View style={styles.container}>
         <View style={styles.miniContainer}>
           <Image
             source={ImagePath.cleaning}
@@ -29,51 +83,35 @@ const Inspection = () => {
             <Text style={{marginLeft: 20}}>201</Text>
           </View>
         </View>
-        <View style={styles.lablelView}>
-          <Text>Select Room Status</Text>
+        <View style={styles.labelView}>
+          <Text>Remark</Text>
         </View>
-        <Dropdown
-          style={styles.dropdown}
-          placeholderStyle={styles.placeholderStyle}
-          selectedTextStyle={styles.selectedTextStyle}
-          data={data}
-          maxHeight={300}
-          labelField="label"
-          valueField="value"
-          placeholder="Select Room Status"
-          value={value}
-          onChange={item => {
-            setValue(item.value);
-          }}
+        <TextInput
+          placeholder="Remark"
+          style={styles.input}
+          value={data.remark}
+          onChangeText={text => handleChange('remark', text)}
+        />
+        <View style={styles.labelView}>
+          <Text>Inspection Time</Text>
+        </View>
+        <TextInput
+          placeholder="Inspection Time"
+          style={styles.input}
+          value={data.inspectionTime}
+          onChangeText={text => handleChange('inspectionTime', text)}
+        />
+        <View style={styles.labelView}>
+          <Text>Select Status</Text>
+        </View>
+        <CustomDropdown
+          placeholder="Select Status"
+          data={statusOptions}
+          value={data.selectedStatus}
+          onChange={value => handleChange('selectedStatus', value)}
         />
       </View>
-
-      {value == 1 && (
-        <View>
-          <CustomButton title="Complete" width="90%" />
-        </View>
-      )}
-      <View style={{backgroundColor: 'white', marginTop: 10}}>
-        {value == 2 && (
-          <View>
-            <TextInput
-              placeholder="Description"
-              style={styles.dropdown}
-              multiline
-              numberOfLines={5}
-              textAlignVertical="top"
-            />
-            <TextInput
-              placeholder="Upload Image If Available"
-              style={styles.dropdown}
-              multiline
-              numberOfLines={10}
-              textAlignVertical="top"
-            />
-            <CustomButton title="Problem " width="90%" />
-          </View>
-        )}
-      </View>
+      <CustomButton title="Submit" width="90%" onPress={handleSubmit} />
     </View>
   );
 };
@@ -101,13 +139,12 @@ const styles = StyleSheet.create({
   },
   input: {
     borderColor: 'gray',
-    borderWidth: 1,
-    width: '95%',
+    borderWidth: 0.5,
+    width: '90%',
     alignSelf: 'center',
     borderRadius: 6,
     paddingHorizontal: 10,
     fontSize: 14,
-    elevation: 5,
     backgroundColor: 'white',
     marginTop: 10,
   },
@@ -126,7 +163,6 @@ const styles = StyleSheet.create({
     shadowRadius: 1.41,
     elevation: 2,
   },
-
   item: {
     padding: 17,
     flexDirection: 'row',
@@ -142,5 +178,15 @@ const styles = StyleSheet.create({
   },
   selectedTextStyle: {
     fontSize: 16,
+  },
+  container: {
+    backgroundColor: 'white',
+    marginTop: 10,
+    paddingBottom: 10,
+  },
+  labelView: {
+    width: '90%',
+    alignSelf: 'center',
+    marginTop: 20,
   },
 });

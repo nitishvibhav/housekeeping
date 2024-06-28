@@ -19,6 +19,11 @@ const AuthStackNavigator = () => {
         component={Login}
         options={{ headerShown: false }}
       />
+      <Stack.Screen
+      name="BottomTabs"
+      component={BottomNavigator}
+      options={{ headerShown: false }}
+    />
      
     </Stack.Navigator>
   );
@@ -28,11 +33,7 @@ const MainStackNavigator = () => {
   return (
     <Stack.Navigator>
 
-    <Stack.Screen
-      name="BottomTabs"
-      component={BottomNavigator}
-      options={{ headerShown: false }}
-    />
+    
       <Stack.Screen
       name="Home"
       component={Home}
@@ -75,7 +76,7 @@ const AppNavigator = () => {
 
   return (
     <NavigationContainer>
-    {getUser ? <MainStackNavigator /> : <AuthStackNavigator />}
+    {user && user.token ? <MainStackNavigator /> : <AuthStackNavigator />}
     </NavigationContainer>
   );
 };

@@ -1,5 +1,7 @@
+
 import {request} from '../../../request';
 
-export const getDepartment = () => {
-  return request.get('department');
-};
+
+export const getDepartment = ()=>{
+    return request.get ('department')
+}

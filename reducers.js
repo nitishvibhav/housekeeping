@@ -6,6 +6,8 @@ import toDoListReducer from './src/redux/todoList/reducer'
 import cleaningReducer from './src/redux/cleaning/reducer'
 import maintenanceReducer from './src/redux/maintenance/reducer'
 import departmentReducer from './src/redux/department/reducer'
+import roomsReducer from './src/redux/rooms/reducer'
+import inspectionReducer from './src/redux/inspection/reducer'
 
 export default combineReducers({
     loginReducer,
@@ -15,4 +17,6 @@ export default combineReducers({
     cleaningReducer,
     maintenanceReducer,
     departmentReducer,
+    roomsReducer,
+    inspectionReducer,
 })

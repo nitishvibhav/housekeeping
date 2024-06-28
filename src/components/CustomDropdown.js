@@ -2,20 +2,18 @@ import React from 'react';
 import {View, Text, Image, StyleSheet} from 'react-native';
 import {Dropdown} from 'react-native-element-dropdown';
 
-const CustomDropdown = ({icon, text, text2, data, value, onChange}) => {
+const CustomDropdown = ({ placeholder, data, value, onChange}) => {
   return (
     <View style={styles.container}>
-    {/*<Image source={icon} style={styles.icon} />*/}
       <View style={styles.textContainer}>
-        <Text style={styles.text}>{text}</Text>
         <Dropdown
           style={styles.dropdown}
-          placeholder={text2}
+          placeholder={placeholder}
           data={data}
           labelField="label"
           valueField="value"
           value={value}
-          onChange={onChange}
+          onChange={item => onChange(item.value)}
           placeholderStyle={styles.placeholderStyle}
           selectedTextStyle={styles.selectedTextStyle}
           itemTextStyle={styles.itemTextStyle}
@@ -32,13 +30,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignSelf: 'center',
     marginTop: 10,
-    borderRadius: 10,
+    borderRadius: 6,
     borderWidth: 1,
     borderColor: '#dadada',
     alignItems: 'center',
     backgroundColor: '#eef3ef',
     padding: 10,
-    width: '95%',
+    width: '90%',
   },
   icon: {
     width: 20,
