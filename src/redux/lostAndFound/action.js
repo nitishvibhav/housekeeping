@@ -13,3 +13,10 @@ export const getLostAndFoundDetails = () => {
     payload: source.getLostAndFound(),
   };
 };
+
+export function deleteLostAndFoundDetails (data, id) {
+  return {
+    type: 'DELETE_LOSTANDFOUND',
+    payload: source.deleteLostAndFound(data,id),
+  };
+};

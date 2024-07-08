@@ -11,7 +11,7 @@ import {
   import {useNavigation} from '@react-navigation/native';
   import CustomButton from '../components/CustomButton';
   import {useDispatch, useSelector} from 'react-redux';
-  import {get} from 'lodash';
+  import get from 'lodash/get';
 
 import { ImagePath } from '../assets/images/imagePath';
 import { login } from '../redux/user/action';
@@ -31,9 +31,8 @@ import { login } from '../redux/user/action';
       }));
     };
   
-    console.log(data, 'data');
-  
     const loginHandler = async () => {
+      console.log(data, "line no. 37..............")
       const res = await dispatch(login(data));
       const status = get(res, 'value.status');
       console.log('status', status);

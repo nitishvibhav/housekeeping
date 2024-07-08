@@ -6,36 +6,49 @@ import {
   TouchableOpacity,
   Image,
   Alert,
-  Animated,
 } from 'react-native';
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {
   deleteMaintenanceDetails,
   getMaintenanceDetails,
 } from '../redux/maintenance/action';
-import {getLostAndFoundDetails} from '../redux/lostAndFound/action';
+import {
+  deleteLostAndFoundDetails,
+  getLostAndFoundDetails,
+} from '../redux/lostAndFound/action';
 import {ImagePath} from '../assets/images/imagePath';
-import {Swipeable} from 'react-native-gesture-handler';
 import {get} from 'lodash';
-import {useNavigation, } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
+import CustomDataTable from '../components/CustomDataTable';
+import { getServiceTicketingDetails } from '../redux/serviceTicketing/action';
 
 const Home = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
 
-  
-
   const {maintenanceData} = useSelector(state => state.maintenanceReducer);
   const {lostandFoundData} = useSelector(state => state.lostAndFoundReducer);
+  const {serviceTicket} = useSelector(state => state.serviceTicketingReducer);
 
-  const handleDelete = async id => {
+  const handleDelete = async (type, item, rowIndex) => {
+    const id = item._id;
     try {
-      const res = await dispatch(deleteMaintenanceDetails(id));
+      let res;
+      if (type === 'maintenance') {
+        res = await dispatch(deleteMaintenanceDetails(id));
+      } else if (type === 'lostAndFound') {
+        res = await dispatch(deleteLostAndFoundDetails(id));
+      }
+
       const status = get(res, 'value.status', res.status);
       if (status === 200) {
         Alert.alert('Success', 'Data deleted successfully.');
-        dispatch(getMaintenanceDetails());
+        if (type === 'maintenance') {
+          dispatch(getMaintenanceDetails());
+        } else if (type === 'lostAndFound') {
+          dispatch(getLostAndFoundDetails());
+        }
       } else {
         console.error('Failed response data:', res);
         Alert.alert('Error', 'Failed to delete data.');
@@ -46,11 +59,17 @@ const Home = () => {
     }
   };
 
+  const handleEdit = (item, rowIndex) => {
+    // Implement your edit logic here
+    console.log('Edit item:', item, rowIndex);
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         await dispatch(getMaintenanceDetails());
         await dispatch(getLostAndFoundDetails());
+        await dispatch(getServiceTicketingDetails())
       } catch (error) {
         console.error('Error fetching data:', error);
         Alert.alert('Error', 'Failed to fetch data.');
@@ -60,21 +79,47 @@ const Home = () => {
     fetchData();
   }, [dispatch]);
 
-  const renderRightActions = (progress, dragX, id) => {
-    const scale = dragX.interpolate({
-      inputRange: [-100, 0],
-      outputRange: [1, 0.5],
-      extrapolate: 'clamp',
-    });
+  const [MaintenanceData, setMaintenanceData] = useState([]);
+  const [LostAndFoundData, setLostAndFoundData] = useState([]);
+  const [serviceTicketingData, setServiceTicketingData] = useState([]);
 
-    return (
-      <TouchableOpacity onPress={() => handleDelete(id)}>
-        <Animated.View
-          style={[styles.deleteButtonContainer, {transform: [{scale}]}]}>
-          <Text style={styles.deleteButtonText}>Delete</Text>
-        </Animated.View>
-      </TouchableOpacity>
-    );
+  useEffect(() => {
+    if (maintenanceData.result) {
+      setMaintenanceData(maintenanceData.result);
+    }
+    if (lostandFoundData.result) {
+      setLostAndFoundData(lostandFoundData.result);
+    }
+    if (serviceTicket.result) {
+      setServiceTicketingData(serviceTicket.result);
+    }
+  }, [
+    maintenanceData.result,
+    lostandFoundData.result,
+    serviceTicket.result,
+  ]);
+
+  const maintenanceColumns = [
+    {label: 'Department', field: 'category', numeric: false},
+    {label: 'Status', field: 'status', numeric: false},
+    {label: 'Description', field: 'description', numeric: false},
+  ];
+
+  const lostAndFoundColumns = [
+    {label: 'Room', field: 'roomNumber', numeric: false},
+    {label: 'Title', field: 'title', numeric: false},
+    {label: 'Status', field: 'status', numeric: false},
+    {label: 'Description', field: 'description', numeric: false},
+  ];
+
+  const serviceTicketingColumns = [
+    {label: 'Room ', field: 'roomNumber', numeric: false},
+    {label: 'Category', field: 'ticketCategory', numeric: false},
+    {label: 'Status', field: 'ticketStatus', numeric: false},
+  ];
+
+  const handleRowPress = (row) => {
+    navigation.navigate('Cleaning', { item: row });
   };
 
   return (
@@ -92,133 +137,30 @@ const Home = () => {
         <Text style={styles.headingText}>Dashboard</Text>
       </View>
       <ScrollView>
-        <View style={styles.miniContainerView}>
-          <Text style={styles.textBig}>Maintenance Data</Text>
-          <TouchableOpacity
-            style={{flexDirection: 'row', alignItems: 'flex-end'}}>
-            <Text style={styles.ViewAllText}>View All</Text>
-            <Image source={ImagePath.nextIcon} style={styles.nextIcon} />
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.mainView}>
-          <View style={{flexDirection: 'row'}}>
-            <View style={{width: '20%', alignItems: 'flex-start'}}>
-              <Text style={{color: 'black', fontWeight: '800'}}>Room</Text>
-            </View>
-            <View style={{width: '30%', alignItems: 'flex-start'}}>
-              <Text style={{color: 'black', fontWeight: '800'}}>Category</Text>
-            </View>
-            <View style={{width: '25%', alignItems: 'flex-start'}}>
-              <Text style={{color: 'black', fontWeight: '800'}}>Status</Text>
-            </View>
-            <View style={{width: '25%', alignItems: 'flex-start'}}>
-              <Text style={{color: 'black', fontWeight: '800'}}>
-                Description
-              </Text>
-            </View>
-          </View>
-          <View style={styles.lineStyle} />
-          {Array.isArray(maintenanceData?.result) ? (
-            maintenanceData.result.map(item => (
-              <Swipeable
-                key={item._id}
-                renderRightActions={(progress, dragX) =>
-                  renderRightActions(progress, dragX, item._id)
-                }>
-                <TouchableOpacity
-                  key={item._id}
-                  onPress={() => navigation.navigate('Maintenance', {item})}
-                  style={styles.container}>
-                  <View style={{flexDirection: 'row'}}>
-                    <View style={{width: '20%', alignItems: 'flex-start'}}>
-                      <Text style={{color: 'black', fontWeight: '400'}}>
-                        {item.roomNumber}
-                      </Text>
-                    </View>
-                    <View style={{width: '30%', alignItems: 'flex-start'}}>
-                      <Text style={{color: 'black', fontWeight: '400'}}>
-                        {item.category}
-                      </Text>
-                    </View>
-                    <View style={{width: '25%', alignItems: 'flex-start'}}>
-                      <Text style={{color: 'black', fontWeight: '400'}}>
-                        {item.status}
-                      </Text>
-                    </View>
-                    <View style={{width: '25%', alignItems: 'flex-start'}}>
-                      <Text style={{color: 'black', fontWeight: '400'}}>
-                        {item.description}
-                      </Text>
-                    </View>
-                  </View>
-
-                  <View style={styles.lineStyle} />
-                </TouchableOpacity>
-              </Swipeable>
-            ))
-          ) : (
-            <Text style={{color: 'black'}}>No Maintenance data available</Text>
-          )}
-        </View>
-        <View style={styles.miniContainerView}>
-          <Text style={styles.textBig}>Lost & Found Data</Text>
-          <TouchableOpacity
-            style={{flexDirection: 'row', alignItems: 'flex-end'}}>
-            <Text style={styles.ViewAllText}>View All</Text>
-            <Image source={ImagePath.nextIcon} style={styles.nextIcon} />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.mainView}>
-          <View style={{flexDirection: 'row'}}>
-            <View style={{width: '20%', alignItems: 'flex-start'}}>
-              <Text style={{color: 'black', fontWeight: '800'}}>Room</Text>
-            </View>
-            <View style={{width: '30%', alignItems: 'flex-start'}}>
-              <Text style={{color: 'black', fontWeight: '800'}}>Title</Text>
-            </View>
-            <View style={{width: '25%', alignItems: 'flex-start'}}>
-              <Text style={{color: 'black', fontWeight: '800'}}>Status</Text>
-            </View>
-            <View style={{width: '25%', alignItems: 'flex-start'}}>
-              <Text style={{color: 'black', fontWeight: '800'}}>
-                Description
-              </Text>
-            </View>
-          </View>
-          <View style={styles.lineStyle} />
-          {Array.isArray(lostandFoundData?.result) ? (
-            lostandFoundData.result.map(item => (
-              <View style={styles.miniContainer} key={item._id}>
-                <View style={{flexDirection: 'row'}}>
-                  <View style={{width: '20%', alignItems: 'flex-start'}}>
-                    <Text style={{color: 'black', fontWeight: '400'}}>
-                      {item.roomNumber}
-                    </Text>
-                  </View>
-                  <View style={{width: '30%', alignItems: 'flex-start'}}>
-                    <Text style={{color: 'black', fontWeight: '400'}}>
-                      {item.title}
-                    </Text>
-                  </View>
-                  <View style={{width: '25%', alignItems: 'flex-start'}}>
-                    <Text style={{color: 'black', fontWeight: '400'}}>
-                      {item.status}
-                    </Text>
-                  </View>
-                  <View style={{width: '25%', alignItems: 'flex-start'}}>
-                    <Text style={{color: 'black', fontWeight: '400'}}>
-                      {item.description}
-                    </Text>
-                  </View>
-                </View>
-                <View style={styles.lineStyle} />
-              </View>
-            ))
-          ) : (
-            <Text style={{color: 'black'}}>No Lost & Found data available</Text>
-          )}
-        </View>
+        <CustomDataTable
+          columns={serviceTicketingColumns}
+          data={serviceTicketingData}
+          title="Service Ticketing Data"
+          onRowPress={handleRowPress} 
+          onEdit={handleEdit}
+          onDelete={(item, rowIndex) => handleDelete('serviceTicketing', item, rowIndex)}
+        />
+        <CustomDataTable
+          columns={maintenanceColumns}
+          data={MaintenanceData}
+          title="Maintenance Data"
+          onRowPress={handleRowPress}
+          onEdit={handleEdit}
+          onDelete={(item, rowIndex) => handleDelete('maintenance', item, rowIndex)}
+        />
+        <CustomDataTable
+          columns={lostAndFoundColumns}
+          data={LostAndFoundData}
+          title="Lost and Found Data"
+          onRowPress={handleRowPress}
+          onEdit={handleEdit}
+          onDelete={(item, rowIndex) => handleDelete('lostAndFound', item, rowIndex)}
+        />
       </ScrollView>
     </View>
   );
@@ -261,7 +203,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     padding: 20,
     alignItems: 'center',
-    marginBottom: 5,
     elevation: 1,
   },
   miniContainerView: {

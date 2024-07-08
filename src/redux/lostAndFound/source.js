@@ -8,3 +8,7 @@ export const postLostAndFound = (req)=>{
 export const getLostAndFound = ()=>{
     return request.get ('lost-found')
 }
+
+export const deleteLostAndFound = (id, data) => {
+    return request.delete(`lost-found/${id}`, data);
+  };

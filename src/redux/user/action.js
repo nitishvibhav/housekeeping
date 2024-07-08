@@ -3,10 +3,10 @@ import * as source from "./source";
 
 import { LOGIN_USER } from './konstant'
 
-export function login (auth) {
+export function login (data) {
     return {
         type: LOGIN_USER,
-        payload: loginUser(auth)
+        payload: loginUser(data)
     }
 }
 

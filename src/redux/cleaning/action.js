@@ -7,9 +7,9 @@ export const getCleaningDetails = () => {
   };
 };
 
-export const postCleaningDetails = () => {
+export const postCleaningDetails = (req) => {
   return {
     type: 'POST_CLEANING',
-    payload: source.postCleaning(),
+    payload: source.postCleaning(req),
   };
 };

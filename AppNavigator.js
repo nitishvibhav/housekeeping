@@ -1,13 +1,13 @@
-import React, { useEffect } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import React, {useEffect} from 'react';
+import {NavigationContainer} from '@react-navigation/native';
 import Home from './src/screens/Home';
 import BottomNavigator from './src/bottom/BottomNavigator';
 import ToDoPage from './src/screens/ToDoPage';
 import Login from './src/screens/Login';
-import { getUser } from './utils';
-import { useDispatch, useSelector } from 'react-redux';
-import { setUser } from './src/redux/user/action';
-import { createStackNavigator } from '@react-navigation/stack';
+import {getUser} from './utils';
+import {useDispatch, useSelector} from 'react-redux';
+import {setUser} from './src/redux/user/action';
+import {createStackNavigator} from '@react-navigation/stack';
 
 const Stack = createStackNavigator();
 
@@ -17,14 +17,13 @@ const AuthStackNavigator = () => {
       <Stack.Screen
         name="Login"
         component={Login}
-        options={{ headerShown: false }}
+        options={{headerShown: false}}
       />
       <Stack.Screen
-      name="BottomTabs"
-      component={BottomNavigator}
-      options={{ headerShown: false }}
-    />
-     
+        name="BottomTabs"
+        component={BottomNavigator}
+        options={{headerShown: false}}
+      />
     </Stack.Navigator>
   );
 };
@@ -32,30 +31,25 @@ const AuthStackNavigator = () => {
 const MainStackNavigator = () => {
   return (
     <Stack.Navigator>
-
-    
       <Stack.Screen
-      name="Home"
-      component={Home}
-      options={{ headerShown: false }}
-    />
+        name="Home"
+        component={Home}
+        options={{headerShown: false}}
+      />
       <Stack.Screen
         name="ToDoPage"
         component={ToDoPage}
-        options={{ headerShown: true, title: 'Details' }}
+        options={{headerShown: true, title: 'Details'}}
       />
-      
     </Stack.Navigator>
   );
 };
 
-
 const AppNavigator = () => {
-
   const user = useSelector(state => state.user);
   const dispatch = useDispatch();
 
-  console.log(user, "line no. 56........")
+  console.log(user, 'line no. 56........');
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -73,10 +67,9 @@ const AppNavigator = () => {
     fetchUser();
   }, [dispatch]);
 
-
   return (
     <NavigationContainer>
-    {user && user.token ? <MainStackNavigator /> : <AuthStackNavigator />}
+      {user && user.token ? <MainStackNavigator /> : <AuthStackNavigator />}
     </NavigationContainer>
   );
 };
